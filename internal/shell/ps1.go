@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"smash/internal/color"
 	"smash/internal/env"
+	"smash/internal/shell/extensions"
 	"strings"
 	"time"
 )
@@ -31,9 +32,8 @@ func getDirInfo(wd string) dirInfo {
 		Wd: wd,
 	}
 
-	baseContext.reset()
-	_ = baseContext.walkDir(wd)
-	di.Dev = baseContext.string()
+	_ = extensions.SetContext(wd)
+	di.Dev = extensions.PromptDisplay()
 
 	return di
 }
