@@ -1,16 +1,14 @@
 package shell
 
 import (
-	"bufio"
 	"errors"
 	"os"
-	"os/exec"
 	"os/user"
 	"path/filepath"
 	"smash/internal/color"
 	"smash/internal/env"
 	"strings"
-	"sync"
+	"time"
 )
 
 var u *user.User
@@ -33,97 +31,11 @@ func getDirInfo(wd string) dirInfo {
 		Wd: wd,
 	}
 
-	wg := sync.WaitGroup{}
-	dev := [4]string{}
-	wg.Add(len(dev))
-	go func() {
-		defer wg.Done()
-		dev[0] = dirInfoGit(wd)
-	}()
-	go func() {
-		defer wg.Done()
-		dev[1] = dirInfoDocker(wd)
-	}()
-	go func() {
-		defer wg.Done()
-		dev[2] = dirInfoGo(wd)
-	}()
-	go func() {
-		defer wg.Done()
-		dev[3] = dirInfoJavascript(wd)
-	}()
-	wg.Wait()
+	baseContext.reset()
+	_ = baseContext.walkDir(wd)
+	di.Dev = baseContext.string()
 
-	sb := strings.Builder{}
-	for _, d := range dev {
-		if d != "" {
-			sb.WriteString(d)
-			sb.WriteString(" ")
-		}
-	}
-	di.Dev = sb.String()
 	return di
-}
-
-func dirInfoGit(wd string) string {
-	// run git to get current branch
-	cmd := exec.Command("git", "branch", "--show-current")
-	cmd.Dir = wd
-	out, err := cmd.Output()
-	if err != nil {
-		return ""
-	}
-	return color.FgGreen + "\U000F02A2 " + strings.TrimSpace(string(out)) + color.Reset
-}
-
-func dirInfoDocker(wd string) string {
-	found := false
-	dirEntries, err := os.ReadDir(wd)
-	if err != nil {
-		return ""
-	}
-	for _, d := range dirEntries {
-		if d.IsDir() {
-			continue
-		}
-		if strings.HasSuffix(d.Name(), "Dockerfile") ||
-			strings.HasSuffix(d.Name(), "docker-compose.yml") ||
-			strings.HasSuffix(d.Name(), "docker-compose.toml") {
-			found = true
-			break
-		}
-	}
-	if found {
-		return color.FgCyan + "\U000F0868" + color.Reset
-	} else {
-		return ""
-	}
-}
-
-func dirInfoGo(wd string) string {
-	goModPath := filepath.Join(wd, "go.mod")
-	f, err := os.Open(goModPath)
-	if err != nil {
-		return ""
-	}
-	defer f.Close()
-
-	// try to find versino e.g. go 1.23.1
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.HasPrefix(line, "go ") {
-			return color.FgBlue + "\uE627 " + line[3:] + color.Reset
-		}
-	}
-	return ""
-}
-
-func dirInfoJavascript(wd string) string {
-	if _, err := os.Stat(filepath.Join(wd, "package.json")); err == nil {
-		return color.FgYellow + "\U000F031E" + color.Reset
-	}
-	return ""
 }
 
 func (di dirInfo) Expand(s string) string {
@@ -134,6 +46,11 @@ func (di dirInfo) Expand(s string) string {
 		return di.Wd
 	case "USER":
 		return u.Username
+	case "HOSTNAME":
+		h, _ := os.Hostname()
+		return h
+	case "TIME":
+		return time.Now().String()
 
 	// Color Reset
 	case "Color.Reset":
