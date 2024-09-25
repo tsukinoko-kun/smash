@@ -82,6 +82,10 @@ func findWithPath(partialPath string, executable bool) []Completion {
 			expandedPartialPath = home + expandedPartialPath[1:]
 		}
 	}
+	if len(expandedPartialPath) == 0 {
+		partialPath = "./"
+		expandedPartialPath = "./"
+	}
 	if strings.HasSuffix(partialPath, "/") {
 		if fi, err := os.Stat(expandedPartialPath); err != nil || !fi.IsDir() {
 			return completions
