@@ -40,6 +40,14 @@ func (g *golang) FileMatch(f os.DirEntry, p string) bool {
 	return false
 }
 
+func (_ *golang) Completions(name string, args []string) []string {
+	return nil
+}
+
+func (_ *golang) Title() string {
+	return "Go"
+}
+
 func init() {
 	register(&golang{})
 }

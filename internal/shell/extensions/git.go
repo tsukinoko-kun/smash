@@ -23,6 +23,14 @@ func (_ *git) FileMatch(f os.DirEntry, _ string) bool {
 	return f.Name() == ".git"
 }
 
+func (_ *git) Completions(name string, args []string) []string {
+	return nil
+}
+
+func (_ *git) Title() string {
+	return "Git"
+}
+
 func init() {
 	priorityRegister(&git{})
 }

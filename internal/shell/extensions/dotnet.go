@@ -20,6 +20,14 @@ func (_ *dotnet) FileMatch(f os.DirEntry, _ string) bool {
 	return strings.HasSuffix(n, ".sln") || strings.HasSuffix(n, ".csproj") || strings.HasSuffix(n, ".fsproj")
 }
 
+func (_ *dotnet) Completions(name string, args []string) []string {
+	return nil
+}
+
+func (_ *dotnet) Title() string {
+	return ".NET"
+}
+
 func init() {
 	register(&dotnet{})
 }
