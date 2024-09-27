@@ -31,3 +31,22 @@ func TestJavascript_Completions(t *testing.T) {
 	testCompletion(t, js, "npm", []string{"run", ""}, []string{"build", "dev"})
 	testCompletion(t, js, "npm", []string{"run", "bui"}, []string{"build"})
 }
+
+func TestJavascript_CompletionsEmpty(t *testing.T) {
+	t.Parallel()
+	js := &javascript{}
+
+	f, err := os.CreateTemp("", "*.package.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, _ = f.WriteString(`{}`)
+	_ = f.Close()
+	js.packageJson = f.Name()
+	defer os.Remove(js.packageJson)
+
+	testCompletion(t, js, "npm", []string{"ru"}, []string{"run"})
+	testCompletion(t, js, "npm", []string{""}, []string{"install", "run"})
+	testCompletion(t, js, "npm", []string{"run", ""}, []string{})
+	testCompletion(t, js, "npm", []string{"run", "bui"}, []string{})
+}
