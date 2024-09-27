@@ -3,7 +3,6 @@ package parser
 import (
 	"errors"
 	"fmt"
-	"github.com/tsukinoko-kun/calc/calc"
 	"io"
 	"os"
 	"os/exec"
@@ -12,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/tsukinoko-kun/calc/calc"
 )
 
 func (e *exe) Run(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
@@ -31,7 +32,12 @@ func (e *exe) Run(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 	}
 	if ok, err := e.internal(stdin, stdout, stderr); ok {
 		if err != nil {
+			os.Setenv("?", "1")
+			os.Setenv("status", "1")
 			_, _ = fmt.Fprintln(stderr, err.Error())
+		} else {
+			os.Setenv("?", "0")
+			os.Setenv("status", "0")
 		}
 		return err
 	} else {
