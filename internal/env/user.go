@@ -4,7 +4,7 @@ import "os/user"
 
 var u *user.User
 
-func getUser() *user.User {
+func GetUser() *user.User {
 	if u != nil {
 		return u
 	}

@@ -2,8 +2,10 @@ package extensions
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"smash/internal/assert"
 	"strings"
 )
 
@@ -13,12 +15,19 @@ type (
 	Extension interface {
 		PromptDisplay() string
 		FileMatch(f os.DirEntry, p string) bool
+		Completions(name string, args []string) []string
+		Title() string
 	}
+
 	extensionWrapper struct {
 		extension Extension
 		active    bool
 	}
 )
+
+func (c Completion) String() string {
+	return fmt.Sprintf(" %s (%s) ", c.DisplayValue, c.Description)
+}
 
 func register(e Extension) {
 	extensionRegister = append(extensionRegister, &extensionWrapper{extension: e, active: true})
@@ -35,7 +44,8 @@ func SetContext(root string) error {
 	}
 
 	// activate extensions that match the current context
-	for {
+	bound := 0
+	for bound = 0; bound < 1000; bound++ {
 		entries, err := os.ReadDir(root)
 		if err != nil {
 			return errors.Join(errors.New("failed to read directory"), err)
@@ -59,6 +69,7 @@ func SetContext(root string) error {
 		}
 		root = nextRoot
 	}
+	assert.NotEqual(bound, 1000, "context search exceeded 1000 iterations")
 	return nil
 }
 

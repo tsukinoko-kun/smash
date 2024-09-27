@@ -2,6 +2,8 @@ package gui
 
 import (
 	"fmt"
+	"smash/internal/shell/extensions"
+	"smash/internal/shell/history"
 	"strings"
 
 	"smash/internal/env"
@@ -22,7 +24,7 @@ type model struct {
 	err          error
 	lines        int
 	prompt       string
-	completions  []shell.Completion
+	completions  []extensions.Completion
 	selectedComp int
 	showComp     bool
 }
@@ -58,7 +60,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyTab:
-			shell.ResetHistoryIndex()
+			history.ResetHistoryIndex()
 			if !m.showComp {
 				if len(trimedInputValue) == 0 {
 					return m, nil
@@ -93,9 +95,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var hisContent string
 				var hisOk bool
 				if msg.Type == tea.KeyUp {
-					hisContent, hisOk = shell.HistoryBack()
+					hisContent, hisOk = history.HistoryBack()
 				} else {
-					hisContent, hisOk = shell.HistoryForward()
+					hisContent, hisOk = history.HistoryForward()
 				}
 				if hisOk {
 					m.textInput.SetValue(hisContent)
@@ -108,12 +110,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 		case tea.KeyEnter:
-			shell.ResetHistoryIndex()
+			history.ResetHistoryIndex()
 			if m.showComp {
 				c := m.completions[m.selectedComp]
-				v := m.textInput.Value()
-				v = v[:len(v)-c.Delete] + c.Value
-				m.textInput.SetValue(v)
+				m.textInput.SetValue(c.Value)
 				m.textInput.CursorEnd()
 				m.showComp = false
 				return m, nil
@@ -122,7 +122,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, tea.Quit
 			}
 		case tea.KeyCtrlC:
-			shell.ResetHistoryIndex()
+			history.ResetHistoryIndex()
 			m.textInput.SetValue("")
 			return m, tea.Quit
 		}
@@ -147,14 +147,14 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		}
-		shell.ResetHistoryIndex()
+		history.ResetHistoryIndex()
 	}
 
 	return m, cmd
 }
 
 // Helper function to compare two slices of completions
-func completionsEqual(a, b []shell.Completion) bool {
+func completionsEqual(a, b []extensions.Completion) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -192,7 +192,7 @@ func (m *model) View() string {
 func RunPrompt() (string, error) {
 	SelectedCompletionBg = lipgloss.Color(env.Config.Color.CompletionSelectedBg)
 	CompletionTextColor = lipgloss.Color(env.Config.Color.CompletionText)
-	shell.ResetHistoryIndex()
+	history.ResetHistoryIndex()
 
 	initialModel, err := initialModel()
 	if err != nil {

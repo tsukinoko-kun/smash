@@ -41,6 +41,14 @@ func (ru *ruby) FileMatch(f os.DirEntry, p string) bool {
 	return false
 }
 
+func (_ *ruby) Completions(name string, args []string) []string {
+	return nil
+}
+
+func (_ *ruby) Title() string {
+	return "Ruby"
+}
+
 func init() {
 	register(&ruby{})
 }

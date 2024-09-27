@@ -62,7 +62,7 @@ func getConfigDir() string {
 	if xdgConfig, ok := os.LookupEnv("XDG_CONFIG_HOME"); ok {
 		d = filepath.Join(xdgConfig, "smash")
 	} else {
-		xdgConfig = filepath.Join(getUser().HomeDir, ".config")
+		xdgConfig = filepath.Join(GetUser().HomeDir, ".config")
 		if _, err := os.Stat(xdgConfig); err == nil {
 			d = filepath.Join(xdgConfig, "smash")
 		} else {
