@@ -54,7 +54,12 @@ func (e *exe) Run(stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
 			untrack(i)
 		}
 		if err != nil {
+			os.Setenv("?", "1")
+			os.Setenv("status", "1")
 			_, _ = fmt.Fprintln(stderr, err.Error())
+		} else {
+			os.Setenv("?", "0")
+			os.Setenv("status", "0")
 		}
 		return err
 	}
