@@ -2,6 +2,7 @@ package gui
 
 import (
 	"fmt"
+	"os"
 	"smash/internal/shell/extensions"
 	"smash/internal/shell/history"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"smash/internal/env"
 	"smash/internal/shell"
 
+	"github.com/charmbracelet/bubbles/cursor"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -29,10 +31,19 @@ type model struct {
 	showComp     bool
 }
 
+func (m *model) Blur() tea.Cmd {
+	m.textInput.Blur()
+	return m.textInput.Cursor.SetMode(cursor.CursorHide)
+}
+
+func (m *model) Focus() tea.Cmd {
+	m.textInput.Focus()
+	return m.textInput.Cursor.SetMode(cursor.CursorBlink)
+}
+
 func initialModel() (*model, error) {
 	ti := textinput.New()
-	ti.Focus()
-	ti.CharLimit = 156
+	ti.CharLimit = 0
 	ti.Prompt = "" // Remove the default '>' prompt
 
 	prompt, err := shell.Ps1()
@@ -40,15 +51,23 @@ func initialModel() (*model, error) {
 		return nil, fmt.Errorf("failed to get prompt: %w", err)
 	}
 
-	return &model{
+	m := &model{
 		textInput: ti,
 		err:       nil,
 		lines:     0,
 		prompt:    prompt,
-	}, nil
+	}
+	m.Focus()
+	return m, nil
 }
 
 func (m *model) Init() tea.Cmd {
+	if wd, err := os.Getwd(); err == nil {
+		if home, err := os.UserHomeDir(); err == nil {
+			wd = strings.Replace(wd, home, "~", 1)
+		}
+		return tea.Batch(tea.SetWindowTitle(wd), textinput.Blink)
+	}
 	return textinput.Blink
 }
 
@@ -57,6 +76,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	trimedInputValue := strings.TrimSpace(m.textInput.Value())
 
 	switch msg := msg.(type) {
+
+	case tea.WindowSizeMsg:
+		return m, nil
+	case tea.FocusMsg:
+		m.Focus()
+		return m, nil
+	case tea.BlurMsg:
+		m.Blur()
+		return m, nil
+
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyTab:
@@ -199,7 +228,7 @@ func RunPrompt() (string, error) {
 		return "", err
 	}
 
-	p := tea.NewProgram(initialModel)
+	p := tea.NewProgram(initialModel, tea.WithReportFocus())
 
 	m, err := p.Run()
 	if err != nil {
