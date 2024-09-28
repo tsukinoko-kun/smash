@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"smash/internal/env"
+	"smash/internal/system"
 	"strconv"
 	"strings"
 	"sync"
@@ -247,4 +248,16 @@ func (e *exe) cd() error {
 	default:
 		return pushDir(strings.Join(e.Args, " "))
 	}
+}
+
+func (e *exe) smashfetch(stdout io.Writer) error {
+	_, _ = fmt.Fprintln(stdout, system.SmashFetch())
+	return nil
+}
+
+const loremipsum = `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.`
+
+func (e *exe) loremipsum(stdout io.Writer) error {
+	_, _ = fmt.Fprintln(stdout, loremipsum)
+	return nil
 }

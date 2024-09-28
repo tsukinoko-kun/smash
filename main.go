@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"runtime"
 	"runtime/debug"
+	"smash/internal/env"
 	"smash/internal/gui"
 	"smash/internal/shell"
 	"smash/internal/shell/history"
@@ -37,6 +38,15 @@ func main() {
 	}()
 
 	defer close(sigint)
+
+	if len(env.Config.OnStart) != 0 {
+		for _, cmd := range env.Config.OnStart {
+			if err := shell.Run(cmd); err != nil {
+				_, _ = fmt.Fprintln(os.Stderr, err)
+			}
+		}
+		<-time.After(400 * time.Millisecond)
+	}
 
 	for {
 		if userInput, err := gui.RunPrompt(); err != nil {
