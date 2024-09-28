@@ -10,6 +10,7 @@ import (
 	"smash/internal/gui"
 	"smash/internal/shell"
 	"smash/internal/shell/history"
+	"smash/internal/system"
 	"time"
 )
 
@@ -37,6 +38,8 @@ func main() {
 	}()
 
 	defer close(sigint)
+
+	fmt.Println(system.Welcome())
 
 	for {
 		if userInput, err := gui.RunPrompt(); err != nil {
