@@ -1,6 +1,7 @@
 package system
 
 import (
+	"runtime/debug"
 	"smash/internal/color"
 	"strings"
 )
@@ -52,7 +53,11 @@ func fetchInfo(i int) (string, bool) {
 	case 0:
 		return color.FgYellow + "OS" + color.Reset + ": " + Name, true
 	case 1:
-		return color.FgYellow + "Interactive Shell" + color.Reset + ": smash", true
+		if info, ok := debug.ReadBuildInfo(); ok {
+			return color.FgYellow + "Interactive Shell" + color.Reset + ": smash " + info.Main.Version, true
+		} else {
+			return color.FgYellow + "Interactive Shell" + color.Reset + ": smash", true
+		}
 	case 2:
 		return color.FgYellow + "Default Shell" + color.Reset + ": " + DefaultShell, true
 	default:
