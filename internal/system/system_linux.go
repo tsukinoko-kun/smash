@@ -138,7 +138,7 @@ const (
 		color.FgGreen + `   _______|` + "\n" +
 		color.FgGreen + `   \_______` + "\n" +
 		color.FgGreen + `__________/` + "\n"
-	asciiLogoOpensuse = asciLogoSuse
+	asciiLogoOpensuse = asciiLogoSuse
 
 	asciiLogoPopos = color.FgCyan + `______` + "\n" +
 		color.FgCyan + `\   _ \        __` + "\n" +
