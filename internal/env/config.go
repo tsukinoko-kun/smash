@@ -54,6 +54,7 @@ type (
 		LogPrompt         string         `toml:"ps2"`
 		Alias             map[string]any `toml:"alias"`
 		Color             smashColor     `toml:"color"`
+		OnStart           []string       `toml:"on_start"`
 	}
 )
 
@@ -101,6 +102,7 @@ func getConfigFile() *smashConfig {
 				c.InteractivePrompt = "${Color.FgHiBlack}$USER@$PWD\t$DEV${Color.Reset}\n${Color.FgBlue}❯${Color.Reset} "
 				c.LogPrompt = "${Color.FgHiBlack}$PWD${Color.Reset} "
 				c.Alias["l"] = []string{"ls", "-l"}
+				c.OnStart = []string{"smashfetch"}
 				e := toml.NewEncoder(f)
 				if err := e.Encode(c); err != nil {
 					panic(errors.Join(errors.New("failed to write config file"), err))

@@ -219,6 +219,9 @@ func (m *model) View() string {
 }
 
 func RunPrompt() (string, error) {
+	// flush stdout
+	os.Stdout.Sync()
+
 	SelectedCompletionBg = lipgloss.Color(env.Config.Color.CompletionSelectedBg)
 	CompletionTextColor = lipgloss.Color(env.Config.Color.CompletionText)
 	history.ResetHistoryIndex()

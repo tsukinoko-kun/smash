@@ -125,7 +125,6 @@ func (di dirInfo) Expand(s string) string {
 		return color.BgHiCyan
 	case "Color.BgHiWhite":
 		return color.BgHiWhite
-
 	}
 	return os.Getenv(s)
 }

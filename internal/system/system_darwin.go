@@ -2,7 +2,11 @@
 
 package system
 
-import "smash/internal/color"
+import (
+	"os"
+	"path/filepath"
+	"smash/internal/color"
+)
 
 const (
 	Name  = "macOS"
@@ -24,3 +28,13 @@ const (
 		color.FgBlue + `     ;KMMMMMMMWXXWMMMMMMMk.` + "\n" +
 		color.FgBlue + `       "cooc*"    "*coo'"` + "\n"
 )
+
+var (
+	DefaultShell = "zsh"
+)
+
+func init() {
+	if shell, ok := os.LookupEnv("SHELL"); ok {
+		DefaultShell = filepath.Base(shell)
+	}
+}

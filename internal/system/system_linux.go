@@ -5,15 +5,17 @@ package system
 import (
 	"bufio"
 	"os"
+	"path/filepath"
 	"smash/internal/color"
 	"strings"
 )
 
 var (
-	Name   = "Linux"
-	id     string
-	idLike string
-	Ascii  string
+	Name         = "Linux"
+	id           string
+	idLike       string
+	Ascii        string
+	DefaultShell = "sh"
 )
 
 const (
@@ -206,6 +208,10 @@ const (
 )
 
 func init() {
+	if shell, ok := os.LookupEnv("SHELL"); ok {
+		DefaultShell = filepath.Base(shell)
+	}
+
 	file, err := os.Open("/etc/os-release")
 	if err == nil {
 		return

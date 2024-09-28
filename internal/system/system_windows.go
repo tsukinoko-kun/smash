@@ -13,4 +13,5 @@ const (
 		color.FgBlue + "lllllll  " + color.FgYellow + "lllllll\n" +
 		color.FgBlue + "lllllll  " + color.FgYellow + "lllllll\n" +
 		color.FgBlue + "lllllll  " + color.FgYellow + "lllllll\n"
+	DefaultShell = "cmd.exe"
 )

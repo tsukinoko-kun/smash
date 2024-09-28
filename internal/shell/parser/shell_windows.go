@@ -1,3 +1,5 @@
+//go:build windows
+
 package parser
 
 import (
@@ -31,6 +33,10 @@ func (e *exe) internal(stdin io.Reader, stdout io.Writer, stderr io.Writer) (boo
 		return true, e.calc(stdin, stdout)
 	case "cd":
 		return true, e.cd()
+	case "smashfetch":
+		return true, e.smashfetch(stdout)
+	case "loremipsum":
+		return true, e.loremipsum(stdout)
 	case "env":
 		return true, e.env(stdout)
 	default:
