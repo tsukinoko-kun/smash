@@ -7,8 +7,6 @@ require (
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.1.1
 	github.com/charmbracelet/lipgloss v0.13.0
-	github.com/chzyer/readline v1.5.1
-	github.com/mattn/go-shellwords v1.0.12
 	github.com/tsukinoko-kun/calc v1.1.2
 )
 
