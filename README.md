@@ -18,10 +18,10 @@ There are some bugs on Windows because I don't use Windows. Feel free to open PR
 - Command history
 - Command aliases
 - Context prompt (e.g. git branch)
+- Context aware completions
 
 ## Upcoming
 
-- Context aware completions
 - More configuration options
 - More builtins
 
