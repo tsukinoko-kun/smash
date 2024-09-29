@@ -5,7 +5,6 @@ package system
 import (
 	"bufio"
 	"os"
-	"os/user"
 	"path/filepath"
 	"runtime/debug"
 	"smash/internal/color"
@@ -21,7 +20,7 @@ var (
 )
 
 const (
-	fetchInfoCount = 5
+	fetchInfoCount = 6
 )
 
 const (
@@ -285,22 +284,10 @@ func setAsciiArt(id string) {
 	}
 }
 
-var hr string
-
 func fetchInfo(i int) (string, bool) {
 	switch i {
 	case 0:
-		username := "unknown"
-		hostname := "unknown"
-		if u, err := user.Current(); err == nil {
-			username = u.Username
-		}
-		if h, err := os.Hostname(); err == nil {
-			hostname = h
-		}
-		x := color.FgMagenta + username + color.Reset + "@" + color.FgMagenta + hostname + color.Reset
-		hr = strings.Repeat("-", len(username)+len(hostname)+1)
-		return x, true
+		return color.FgYellow + username + color.Reset + "@" + color.FgYellow + hostname + color.Reset, true
 	case 1:
 		return color.Reset + hr, true
 	case 2:
@@ -313,6 +300,23 @@ func fetchInfo(i int) (string, bool) {
 		}
 	case 4:
 		return color.FgYellow + "Default Shell" + color.Reset + ": " + DefaultShell, true
+	case 5:
+		sb := strings.Builder{}
+		sb.WriteString(color.FgYellow)
+		sb.WriteString("Terminal")
+		sb.WriteString(color.Reset)
+		sb.WriteString(": ")
+		tOk := false
+		if termProgram, ok := os.LookupEnv("TERM_PROGRAM"); ok {
+			sb.WriteString(termProgram)
+			sb.WriteString(" ")
+			tOk = true
+		}
+		if term, ok := os.LookupEnv("TERM"); ok {
+			sb.WriteString(term)
+			tOk = true
+		}
+		return sb.String(), tOk
 	default:
 		return "", false
 	}

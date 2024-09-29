@@ -1,13 +1,28 @@
 package system
 
 import (
+	"os"
+	"os/user"
 	"regexp"
 	"strings"
 )
 
 var (
-	ansiRe = regexp.MustCompile(`\x1b\[[0-9]*m`)
+	ansiRe   = regexp.MustCompile(`\x1b\[[0-9]*m`)
+	username string
+	hostname string
+	hr       string
 )
+
+func init() {
+	if u, err := user.Current(); err == nil {
+		username = u.Username
+	}
+	if h, err := os.Hostname(); err == nil {
+		hostname = h
+	}
+	hr = strings.Repeat("-", len(username)+len(hostname)+1)
+}
 
 func visLen(s string) int {
 	return len(ansiRe.ReplaceAllString(s, ""))

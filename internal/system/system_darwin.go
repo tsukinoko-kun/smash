@@ -4,7 +4,7 @@ package system
 
 import (
 	"os"
-	"os/user"
+	"os/exec"
 	"path/filepath"
 	"runtime/debug"
 	"smash/internal/color"
@@ -30,7 +30,7 @@ const (
 		color.FgBlue + `    kMMMMMMMMMMMMMMMMMMMMMMd` + "\n" +
 		color.FgBlue + `     ;KMMMMMMMWXXWMMMMMMMk.` + "\n" +
 		color.FgBlue + `       "cooc*"    "*coo'"` + "\n"
-	fetchInfoCount = 7
+	fetchInfoCount = 9
 )
 
 var (
@@ -43,22 +43,10 @@ func init() {
 	}
 }
 
-var hr string
-
 func fetchInfo(i int) (string, bool) {
 	switch i {
 	case 0:
-		username := "unknown"
-		hostname := "unknown"
-		if u, err := user.Current(); err == nil {
-			username = u.Username
-		}
-		if h, err := os.Hostname(); err == nil {
-			hostname = h
-		}
-		x := color.FgMagenta + username + color.Reset + "@" + color.FgMagenta + hostname + color.Reset
-		hr = strings.Repeat("-", len(username)+len(hostname)+1)
-		return x, true
+		return color.FgGreen + username + color.Reset + "@" + color.FgGreen + hostname + color.Reset, true
 	case 1:
 		return color.Reset + hr, true
 	case 2:
@@ -72,10 +60,53 @@ func fetchInfo(i int) (string, bool) {
 	case 4:
 		return color.FgYellow + "Default Shell" + color.Reset + ": " + DefaultShell, true
 	case 5:
-		return color.FgYellow + "DE" + color.Reset + ": Aqua" + DefaultShell, true
+		return color.FgYellow + "Desktop Environment" + color.Reset + ": " + "Aqua", true
 	case 6:
-		return color.FgYellow + "WM" + color.Reset + ": Quartz Compositor", true
+		return color.FgYellow + "Window Manager" + color.Reset + ": " + "Quartz Compositor", true
+	case 7:
+		sb := strings.Builder{}
+		sb.WriteString(color.FgYellow)
+		sb.WriteString("Terminal")
+		sb.WriteString(color.Reset)
+		sb.WriteString(": ")
+		tOk := false
+		if termProgram, ok := os.LookupEnv("TERM_PROGRAM"); ok {
+			sb.WriteString(termProgram)
+			sb.WriteString(" ")
+			tOk = true
+		}
+		if term, ok := os.LookupEnv("TERM"); ok {
+			sb.WriteString(term)
+			tOk = true
+		}
+		return sb.String(), tOk
+	case 8:
+		sb := strings.Builder{}
+		sb.WriteString(color.FgYellow)
+		sb.WriteString("CPU")
+		sb.WriteString(color.Reset)
+		sb.WriteString(": ")
+		cOk := false
+		if cpu, err := sysctl("machdep.cpu.brand_string"); err == nil {
+			sb.WriteString(cpu)
+			sb.WriteString(" ")
+			cOk = true
+		}
+		if cores, err := sysctl("hw.logicalcpu_max"); err == nil {
+			sb.WriteString(cores)
+			sb.WriteString("-Core")
+			cOk = true
+		}
+		return sb.String(), cOk
 	default:
 		return "", false
 	}
+}
+
+func sysctl(name string) (string, error) {
+	out, err := exec.Command("sysctl", "-n", name).Output()
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(out)), nil
 }
