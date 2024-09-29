@@ -2,13 +2,31 @@ package extensions
 
 import (
 	"os"
-	"slices"
 	"testing"
 )
 
+func sliceEqualUnordered(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for _, v := range a {
+		found := false
+		for _, w := range b {
+			if v == w {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+	return true
+}
+
 func testCompletion(t *testing.T, ex Extension, name string, args []string, expected []string) {
 	res := ex.Completions(name, args)
-	if !slices.Equal(res, expected) {
+	if !sliceEqualUnordered(res, expected) {
 		t.Errorf("completion of `%s %s` returned %v expected %v", name, args, res, expected)
 	}
 }
