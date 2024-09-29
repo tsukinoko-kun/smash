@@ -255,6 +255,22 @@ func (e *exe) smashfetch(stdout io.Writer) error {
 	return nil
 }
 
+func (s *exe) sleep() error {
+	if len(s.Args) == 0 {
+		return errors.New("sleep: missing operand")
+	}
+	var dur time.Duration
+	for _, arg := range s.Args {
+		d, err := time.ParseDuration(arg)
+		if err != nil {
+			return err
+		}
+		dur += d
+	}
+	time.Sleep(dur)
+	return nil
+}
+
 const loremipsum = `Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.`
 
 func (e *exe) loremipsum(stdout io.Writer) error {

@@ -45,7 +45,6 @@ func main() {
 				_, _ = fmt.Fprintln(os.Stderr, err)
 			}
 		}
-		<-time.After(400 * time.Millisecond)
 	}
 
 	for {

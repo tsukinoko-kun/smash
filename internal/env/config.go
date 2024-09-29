@@ -102,7 +102,7 @@ func getConfigFile() *smashConfig {
 				c.InteractivePrompt = "${Color.FgHiBlack}$USER@$PWD\t$DEV${Color.Reset}\n${Color.FgBlue}❯${Color.Reset} "
 				c.LogPrompt = "${Color.FgHiBlack}$PWD${Color.Reset} "
 				c.Alias["l"] = []string{"ls", "-l"}
-				c.OnStart = []string{"smashfetch"}
+				c.OnStart = []string{"smashfetch", "sleep 500ms"}
 				e := toml.NewEncoder(f)
 				if err := e.Encode(c); err != nil {
 					panic(errors.Join(errors.New("failed to write config file"), err))
