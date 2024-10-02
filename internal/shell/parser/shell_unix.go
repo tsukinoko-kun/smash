@@ -12,6 +12,7 @@ var InternalToolNames = [...]string{
 	"calc",
 	"cd",
 	"zu",
+	"smashfetch",
 }
 
 func (e *exe) internal(stdin io.Reader, stdout io.Writer, stderr io.Writer) (bool, error) {

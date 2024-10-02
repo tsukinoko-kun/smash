@@ -17,6 +17,7 @@ var InternalToolNames = [...]string{
 	"calc",
 	"cd",
 	"zu",
+	"smashfetch",
 	"env",
 }
 

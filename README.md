@@ -28,7 +28,8 @@ There are some bugs on Windows because I don't use Windows. Feel free to open PR
 - `exit` (exit shell session)
 - `printf` (print formatted string to stdout)
 - `time` (time command execution)
-- `zu` (similar to [ajeetdsouza/zoxide](https://github.com/ajeetdsouza/zoxide), change directory based on history and frequency)
+- `zu` (change directory based on history and frequency, similar to [ajeetdsouza/zoxide](https://github.com/ajeetdsouza/zoxide))
+- `smashfetch` (show system information, similar to [dylanaraps/neofetch](https://github.com/dylanaraps/neofetch))
 
 ## Upcoming
 
