@@ -236,6 +236,24 @@ func pushDir(p string) error {
 	}
 }
 
+func pushDirZu(p string) error {
+	cdHistoryMut.Lock()
+	defer cdHistoryMut.Unlock()
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	cdHistory = append(cdHistory, wd)
+
+	if err := zu.To(p); err != nil {
+		return err
+	} else {
+		_ = os.Setenv("PWD", p)
+		return nil
+	}
+}
+
 func (e *exe) cd() error {
 	switch len(e.Args) {
 	case 0:
@@ -251,14 +269,15 @@ func (e *exe) cd() error {
 	}
 }
 
-func (e *exe) z() error {
+func (e *exe) zu() error {
 	switch len(e.Args) {
 	case 0:
-		return pushDir(env.GetUser().HomeDir)
+		return pushDirZu(env.GetUser().HomeDir)
 	case 1:
-		if e.Args[0] == "-c" {
+		switch e.Args[0] {
+		case "-c", "--clear":
 			return zu.Clear()
-		} else if e.Args[0] == "-l" {
+		case "-l", "--list":
 			if l, err := zu.List(); err != nil {
 				return err
 			} else {
@@ -267,11 +286,13 @@ func (e *exe) z() error {
 				}
 				return nil
 			}
-		} else {
-			return zu.To(e.Args[0])
+		case "-":
+			return popDir()
+		default:
+			return pushDirZu(e.Args[0])
 		}
 	default:
-		return errors.New("z: too many operands")
+		return pushDirZu(strings.Join(e.Args, " "))
 	}
 }
 
