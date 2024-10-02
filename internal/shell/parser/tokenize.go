@@ -26,6 +26,7 @@ type (
 const (
 	TokenTypeName = iota
 	TokenTypeOperator
+	TokenTypeEnvironment
 )
 
 func newToken(start int) *TokenBuilder {
@@ -40,15 +41,21 @@ func Tokenize(input string) []Token {
 	var tokens []Token
 	tb := newToken(0)
 	quotation := rune(0)
+	vars := make(map[string]string)
 
 	next := func(end int, nextStart int) {
 		tb.End = end
-		for _, s := range expand(tb.Content.String(), quotation) {
+		for _, s := range expand(tb.Content.String(), quotation, vars) {
 			t := Token{Content: s, Start: tb.Start, End: tb.End}
-			for _, op := range operators {
-				if t.Content == op {
-					t.Type = TokenTypeOperator
-					break
+			if k, v, ok := parseEnv(s); ok {
+				t.Type = TokenTypeEnvironment
+				vars[k] = v
+			} else {
+				for _, op := range operators {
+					if t.Content == op {
+						t.Type = TokenTypeOperator
+						break
+					}
 				}
 			}
 			tokens = append(tokens, t)
@@ -92,7 +99,7 @@ func Tokenize(input string) []Token {
 
 	if tb.Content.Len() != 0 {
 		tb.End = len(input) - 1
-		for _, s := range expand(tb.Content.String(), quotation) {
+		for _, s := range expand(tb.Content.String(), quotation, vars) {
 			t := Token{Content: s, Start: tb.Start, End: tb.End}
 			for _, op := range operators {
 				if t.Content == op {
@@ -113,14 +120,16 @@ func Tokenize(input string) []Token {
 	return tokens
 }
 
-func expand(s string, quotation rune) []string {
+func expand(s string, quotation rune, v map[string]string) []string {
 	switch quotation {
 	case '\'':
 		return []string{s}
 	case '"':
-		return []string{expandVariables(expandTilde(s))}
+		return []string{expandVariables(expandTilde(s), v)}
+	case '`':
+		return []string{expandVariables(s, v)}
 	default:
-		return expandGlobs(expandVariables(expandTilde(s)))
+		return expandGlobs(expandVariables(expandTilde(s), v))
 	}
 }
 
@@ -137,8 +146,13 @@ func expandTilde(s string) string {
 	return s
 }
 
-func expandVariables(s string) string {
-	return os.ExpandEnv(s)
+func expandVariables(s string, v map[string]string) string {
+	return os.Expand(s, func(key string) string {
+		if val, ok := v[key]; ok {
+			return val
+		}
+		return os.Getenv(key)
+	})
 }
 
 func expandGlobs(s string) []string {

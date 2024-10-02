@@ -11,6 +11,12 @@ func NotEqual[T comparable](a, b T, errorMessage string) {
 	}
 }
 
+func Equal[T comparable](a, b T, errorMessage string) {
+	if a != b {
+		panic(fmt.Sprintf("assertion failed: Equal(%v, %v): %s", a, b, errorMessage))
+	}
+}
+
 func NotEmpty(s string, errorMessage string) {
 	if len(s) == 0 {
 		panic(fmt.Sprintf("assertion failed: NotEmpty(%q): %s", s, errorMessage))

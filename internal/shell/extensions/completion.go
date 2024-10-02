@@ -14,7 +14,7 @@ type (
 )
 
 func GetCompletion(tokens []parser.Token, newArg bool) []Completion {
-	assert.GreaterThan(len(tokens), 0, "tokens must not be empty")
+	assert.GreaterThan(len(tokens), 0, "tokens for GetCompletion must not be empty")
 	name := tokens[0].Content
 	var args []string
 	if len(tokens) > 1 {
