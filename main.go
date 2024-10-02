@@ -22,7 +22,7 @@ func main() {
 			q.Add("title", "runtime error")
 			q.Add("body", fmt.Sprintf("Runtime error caught in main: %s\n\nExplain what you did:\n\nOS: %s  \nArch: %s  \nStack:\n```\n%s\n```\n", r, runtime.GOOS, runtime.GOARCH, string(debug.Stack())))
 			issueUrl.RawQuery = q.Encode()
-			_, _ = fmt.Fprintf(os.Stderr, "smash: runtime error: %s\nplease report this: %s\n", r, issueUrl.String())
+			_, _ = fmt.Fprintf(os.Stderr, "smash: runtime error: %s\n\nStack:\n%s\n\nplease report this: %s\n", r, string(debug.Stack()), issueUrl.String())
 			<-time.After(15 * time.Second)
 		}
 	}()
@@ -54,7 +54,9 @@ func main() {
 			if userInput == "" {
 				continue
 			}
-			_ = history.AddToHistory(userInput)
+			if err := history.AddToHistory(userInput); err != nil {
+				panic(err)
+			}
 			ps2, err := shell.Ps2()
 			if err != nil {
 				fmt.Printf("ps2 error: %v\n", err)

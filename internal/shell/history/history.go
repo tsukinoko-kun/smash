@@ -7,7 +7,10 @@ import (
 	"smash/internal/env"
 )
 
-const maxHistory = 512
+const (
+	historyHwm = 128
+	historyLwm = 64
+)
 
 var (
 	history      []string
@@ -24,9 +27,10 @@ func loadHistory() error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		history = append(history, scanner.Text())
-		if len(history) > maxHistory {
-			history = history[1:]
-		}
+	}
+
+	if len(history) > historyHwm {
+		history = history[historyLwm:]
 	}
 
 	currentIndex = len(history)
@@ -66,12 +70,14 @@ func HistoryForward() (string, bool) {
 
 // AddToHistory adds a new entry to the history
 func AddToHistory(entry string) error {
+	// ensure the latest history is loaded
 	if len(history) == 0 {
 		if err := loadHistory(); err != nil {
 			return err
 		}
 	}
 
+	// check if the latest history entry is the same as the new entry
 	if len(history) != 0 {
 		latestHistoryEntry := history[len(history)-1]
 		if latestHistoryEntry == entry {
@@ -79,22 +85,38 @@ func AddToHistory(entry string) error {
 		}
 	}
 
+	// append new entry to history in memory
 	history = append(history, entry)
-	if len(history) > maxHistory {
-		history = history[1:]
+
+	// ensure history length does not exceed the high water mark
+	if len(history) > historyHwm {
+		history = history[historyLwm:]
+
+		// write whole history to history file
+		file, err := os.Create(env.HistoryFile)
+		if err != nil {
+			return fmt.Errorf("failed to open history file: %w", err)
+		}
+		defer file.Close()
+		writer := bufio.NewWriter(file)
+		defer writer.Flush()
+		for _, entry := range history {
+			if _, err := writer.WriteString(entry + "\n"); err != nil {
+				return fmt.Errorf("failed to write to history file: %w", err)
+			}
+		}
+	} else {
+		// append new entry to history file
+		file, err := os.OpenFile(env.HistoryFile, os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			return fmt.Errorf("failed to open history file: %w", err)
+		}
+		defer file.Close()
+		if _, err := file.WriteString(entry + "\n"); err != nil {
+			return fmt.Errorf("failed to write to history file: %w", err)
+		}
 	}
 	currentIndex = len(history)
-
-	// Append to file
-	file, err := os.OpenFile(env.HistoryFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-	if err != nil {
-		return fmt.Errorf("failed to open history file: %w", err)
-	}
-	defer file.Close()
-
-	if _, err := fmt.Fprintln(file, entry); err != nil {
-		return fmt.Errorf("failed to write to history file: %w", err)
-	}
 
 	return nil
 }

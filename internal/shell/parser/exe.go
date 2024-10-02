@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"smash/internal/env"
+	"smash/internal/shell/parser/zu"
 	"smash/internal/system"
 	"strconv"
 	"strings"
@@ -247,6 +248,30 @@ func (e *exe) cd() error {
 		}
 	default:
 		return pushDir(strings.Join(e.Args, " "))
+	}
+}
+
+func (e *exe) z() error {
+	switch len(e.Args) {
+	case 0:
+		return pushDir(env.GetUser().HomeDir)
+	case 1:
+		if e.Args[0] == "-c" {
+			return zu.Clear()
+		} else if e.Args[0] == "-l" {
+			if l, err := zu.List(); err != nil {
+				return err
+			} else {
+				for _, e := range l {
+					_, _ = fmt.Println(e)
+				}
+				return nil
+			}
+		} else {
+			return zu.To(e.Args[0])
+		}
+	default:
+		return errors.New("z: too many operands")
 	}
 }
 

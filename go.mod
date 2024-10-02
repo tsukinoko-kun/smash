@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.1.1
 	github.com/charmbracelet/lipgloss v0.13.0
 	github.com/tsukinoko-kun/calc v1.1.2
+	google.golang.org/protobuf v1.34.2
 )
 
 require (

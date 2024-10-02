@@ -12,30 +12,40 @@ There are some bugs on Windows because I don't use Windows. Feel free to open PR
 
 ## Features
 
--   Substitute environment variables and ~
--   Tab completion
--   Configurable and interactive prompt
--   Command history
--   Command aliases
--   Context prompt (e.g. git branch)
--   Context aware completions
+- Substitute environment variables and ~
+- Tab completion
+- Configurable and interactive prompt
+- Command history
+- Command aliases
+- Context prompt (e.g. git branch)
+- Context aware completions
+
+### Builtins
+
+- `calc` (simple calculator)
+- `cd` (change directory)
+- `echo` (print arguments to stdout)
+- `exit` (exit shell session)
+- `printf` (print formatted string to stdout)
+- `time` (time command execution)
+- `zu` (similar to [ajeetdsouza/zoxide](https://github.com/ajeetdsouza/zoxide), change directory based on history and frequency)
 
 ## Upcoming
 
--   More configuration options
--   More builtins
+- More configuration options
+- More builtins
 
 ## Configuration
 
 `~/.config/smash/config.toml`
 
--   `ps1`: Prompt shown on user input
--   `ps2`: Prompt shown on the executed commands
--   `alias`: Map of command aliases where keys can be a string or list of strings
--   `color`: Map of colors supporting all [charmbracelet/lipgloss](https://github.com/charmbracelet/lipgloss) colors
-    -   `completion_text`: text color of completion list
-    -   `completion_selected_bg`: background color of selected completion entry
--   `on_start`: List of commands to run on shell start
+- `ps1`: Prompt shown on user input
+- `ps2`: Prompt shown on the executed commands
+- `alias`: Map of command aliases where keys can be a string or list of strings
+- `color`: Map of colors supporting all [charmbracelet/lipgloss](https://github.com/charmbracelet/lipgloss) colors
+  - `completion_text`: text color of completion list
+  - `completion_selected_bg`: background color of selected completion entry
+- `on_start`: List of commands to run on shell start
 
 ## Install
 

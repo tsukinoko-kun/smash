@@ -13,11 +13,13 @@ var (
 	Config      *smashConfig
 	Alias       map[string][]string
 	HistoryFile string
+	ZuFile      string
 )
 
 func init() {
 	loadVars()
 	HistoryFile = filepath.Join(getConfigDir(), "history.txt")
+	ZuFile = filepath.Join(getConfigDir(), "zu.bin")
 	Config = getConfigFile()
 	if Config.Alias != nil {
 		Alias = make(map[string][]string, len(Config.Alias))

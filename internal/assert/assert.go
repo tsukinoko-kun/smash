@@ -28,3 +28,9 @@ func SmallerThan[T cmp.Ordered](x, smallerThan T, errorMessage string) {
 		panic(fmt.Sprintf("assertion failed: SmallerThan(%v, %v): %s", x, smallerThan, errorMessage))
 	}
 }
+
+func NotNil[T any](x *T, errorMessage string) {
+	if x == nil {
+		panic(fmt.Sprintf("assertion failed: NotNil(%v): %s", x, errorMessage))
+	}
+}

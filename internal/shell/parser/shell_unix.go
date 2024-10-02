@@ -11,6 +11,7 @@ var InternalToolNames = [...]string{
 	"time",
 	"calc",
 	"cd",
+	"zu",
 }
 
 func (e *exe) internal(stdin io.Reader, stdout io.Writer, stderr io.Writer) (bool, error) {
@@ -27,6 +28,8 @@ func (e *exe) internal(stdin io.Reader, stdout io.Writer, stderr io.Writer) (boo
 		return true, e.calc(stdin, stdout)
 	case "cd":
 		return true, e.cd()
+	case "zu":
+		return true, e.z()
 	case "smashfetch":
 		return true, e.smashfetch(stdout)
 	case "sleep":

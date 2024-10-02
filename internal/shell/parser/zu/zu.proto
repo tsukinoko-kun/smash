@@ -1,0 +1,13 @@
+syntax="proto3";
+package zu;
+
+option go_package = "internal/shell/parser/zu";
+
+message zu {
+    message entry {
+        string path = 1;
+        int64 accessCount = 2;
+    }
+
+    repeated entry entries = 1;
+}
