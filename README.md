@@ -47,6 +47,7 @@ There are some bugs on Windows because I don't use Windows. Feel free to open PR
   - `completion_text`: text color of completion list
   - `completion_selected_bg`: background color of selected completion entry
 - `on_start`: List of commands to run on shell start
+- `env`: Map of environment variables
 
 ## Install
 

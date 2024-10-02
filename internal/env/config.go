@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
@@ -44,6 +45,11 @@ func init() {
 	} else {
 		Alias = make(map[string][]string)
 	}
+	if Config.Environment != nil {
+		for key, val := range Config.Environment {
+			os.Setenv(key, val)
+		}
+	}
 }
 
 type (
@@ -52,11 +58,12 @@ type (
 		CompletionSelectedBg string `toml:"completion_selected_bg"`
 	}
 	smashConfig struct {
-		InteractivePrompt string         `toml:"ps1"`
-		LogPrompt         string         `toml:"ps2"`
-		Alias             map[string]any `toml:"alias"`
-		Color             smashColor     `toml:"color"`
-		OnStart           []string       `toml:"on_start"`
+		InteractivePrompt string            `toml:"ps1"`
+		LogPrompt         string            `toml:"ps2"`
+		Alias             map[string]any    `toml:"alias"`
+		Color             smashColor        `toml:"color"`
+		OnStart           []string          `toml:"on_start"`
+		Environment       map[string]string `toml:"env"`
 	}
 )
 
@@ -85,7 +92,8 @@ func getConfigDir() string {
 func getConfigFile() *smashConfig {
 	p := filepath.Join(getConfigDir(), "config.toml")
 	c := &smashConfig{
-		Alias: make(map[string]any),
+		Alias:       make(map[string]any),
+		Environment: make(map[string]string),
 		Color: smashColor{
 			CompletionText:       "8",
 			CompletionSelectedBg: "4",
@@ -104,6 +112,13 @@ func getConfigFile() *smashConfig {
 				c.InteractivePrompt = "${Color.FgHiBlack}$USER@$PWD\t$DEV${Color.Reset}\n${Color.FgBlue}❯${Color.Reset} "
 				c.LogPrompt = "${Color.FgHiBlack}$PWD${Color.Reset} "
 				c.Alias["l"] = []string{"ls", "-l"}
+				if vim, err := exec.LookPath("nvim"); err == nil {
+					c.Environment["EDITOR"] = vim
+					c.Environment["GIT_EDITOR"] = vim
+				} else if vim, err := exec.LookPath("vim"); err == nil {
+					c.Environment["EDITOR"] = vim
+					c.Environment["GIT_EDITOR"] = vim
+				}
 				c.OnStart = []string{"smashfetch", "sleep 500ms"}
 				e := toml.NewEncoder(f)
 				if err := e.Encode(c); err != nil {
